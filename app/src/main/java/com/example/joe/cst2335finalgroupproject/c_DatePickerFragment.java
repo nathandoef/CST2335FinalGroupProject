@@ -11,15 +11,26 @@ import android.widget.EditText;
 import java.util.Calendar;
 
 /**
- * Created by Nathan on 2017-12-06.
+ * Custom DatePicker fragment that is used to select the date a fuel purchase was made
+ * @author 		Nathan Doef
+ * @version		2
  */
-
 public class c_DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
 
+    /** Activity where the DatePicker should be loaded */
     private Activity parentActivity;
+
+    /** Edit Text to display the date selected from the DatePicker */
     private EditText display;
+
+    /** Calendar object used to handle date functionality */
     private Calendar calendar = Calendar.getInstance();
 
+    /**
+     * creates a new instance of a Calendar and sets the date to the current date
+     * @param savedInstanceState
+     * @return DatePicker fragment
+     */
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final Calendar calendar = Calendar.getInstance();
@@ -29,11 +40,22 @@ public class c_DatePickerFragment extends DialogFragment implements DatePickerDi
         return new DatePickerDialog(parentActivity, this, year, month, day);
     }
 
+    /**
+     * Gets a handle to the parent activity
+     * @param activity
+     */
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         this.parentActivity = activity;
     }
 
+    /**
+     * displays the date selected in the Edit Text
+     * @param view
+     * @param year
+     * @param monthOfYear
+     * @param dayOfMonth
+     */
     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
         calendar.set(Calendar.YEAR, year);
         calendar.set(Calendar.MONTH, monthOfYear);
@@ -42,6 +64,10 @@ public class c_DatePickerFragment extends DialogFragment implements DatePickerDi
         display.setText(c_CarTrackerActivity.DD_MM_YYYY.format(calendar.getTime()));
     }
 
+    /**
+     * connects the Edit Text to the DatePicker
+     * @param editText
+     */
     public void setDisplay(EditText editText) {
         this.display = editText;
     }

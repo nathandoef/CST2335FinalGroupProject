@@ -16,15 +16,30 @@ import android.widget.TextView;
 import java.util.Date;
 
 /**
- * Created by Nathan on 2017-12-09.
+ * Accepts input from the user. This fragment is used for both adding new fuel details
+ * and updating existing fuel details
+ * @author 		Nathan Doef
+ * @version		2
  */
-
 public class c_EnterFuelDetailsFragment extends Fragment {
 
+    /** Activity where the fragment is loaded */
     private Activity callingActivity;
+
+    /** details passesd to the fragment */
     Bundle fuelDetails;
+
+    /** text that will be displayed in the alert message if an error occurs */
     String alertMsgText = "";
 
+    /**
+     * Finds controls and sets the title and button text of the fragment. If the user is editting
+     * an existing entry, the values are loaded into the appropriate fields.
+     * @param inflater
+     * @param container
+     * @param saveInstanceState
+     * @return
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState){
 
@@ -47,6 +62,7 @@ public class c_EnterFuelDetailsFragment extends Fragment {
             enterFuelDetailsTitle.setText(title);
             btnEnterDetails.setText(btnText);
 
+            // cache fuel details, will be null if add request
             fuelDetails = fragmentDetails.getBundle("fuelDetails");
 
             // Edit request, populate the previous field values
@@ -69,6 +85,7 @@ public class c_EnterFuelDetailsFragment extends Fragment {
             }
         }
 
+        // Event handlers when the users submits an added or edited entry
         btnEnterDetails.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -94,17 +111,17 @@ public class c_EnterFuelDetailsFragment extends Fragment {
 
                     switch(callingActivity.getLocalClassName()){
 
-                        // The fragment was called from portrait orientation and navigated to a
-                        //   new activity
+                        // portrait orientation - edit existing entry
                         case "c_EditFuelDetailsActivity":
                             ((c_EditFuelDetailsActivity)callingActivity).updateFuelDetail(fuelDetails);
                             break;
+
+                        // portrait orientation - add entry
                         case "c_AddFuelDetailsActivity":
                             ((c_AddFuelDetailsActivity)callingActivity).addFuelDetail(fuelDetails);
                             break;
 
-                        // The fragment was called from landscape orientation and was loaded
-                        //  into the FrameLayout view
+                        // landscape orientation
                         case "c_CarTrackerActivity":
                             // no id present, add fuel detail
                             if (fuelDetails.getLong("id", -1) == -1){
@@ -118,8 +135,7 @@ public class c_EnterFuelDetailsFragment extends Fragment {
                                     .remove(c_EnterFuelDetailsFragment.this).commit();
                             break;
                     }
-
-                } catch (Exception e) {
+                } catch (Exception e) { // attempt to save empty or invalid date
 
                     LayoutInflater inflater = callingActivity.getLayoutInflater();
                     LinearLayout rootView
@@ -127,6 +143,7 @@ public class c_EnterFuelDetailsFragment extends Fragment {
 
                     ((TextView)rootView.findViewById(R.id.tvCarAlertMsg)).setText(alertMsgText);
 
+                    // display error message
                     AlertDialog.Builder builder = new AlertDialog.Builder(callingActivity);
                     builder.setView(rootView);
                     builder.setPositiveButton(getResources().getString(R.string.c_Ok),
@@ -145,6 +162,7 @@ public class c_EnterFuelDetailsFragment extends Fragment {
         });
 
 
+        // Event Handler for when the user cancels an entry
         btnEnterDetailsCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -170,6 +188,7 @@ public class c_EnterFuelDetailsFragment extends Fragment {
         });
 
 
+        // update the Edit Text to reflect the date picked in the DatePicker
         etDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -182,6 +201,10 @@ public class c_EnterFuelDetailsFragment extends Fragment {
         return view;
     }
 
+    /**
+     * get a handle on the calling activty
+     * @param activity calling activity
+     */
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);

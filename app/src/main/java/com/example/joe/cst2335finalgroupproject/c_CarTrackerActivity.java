@@ -38,64 +38,65 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+/**
+ * The Car Activity's main page
+ * @author 		Nathan Doef
+ * @version		4
+ */
 public class c_CarTrackerActivity extends AppCompatActivity {
 
-    /**
-     * Priorities for each Activity (suggested complete in this order in case Prof
-     * pulls us for review with no warning.)
-     *
-     * Milestone 1 (Must be demonstrated December 7th):
-     *          3.	Each Activity must have a ListView to present items. Selecting an item from the ListView must show detailed information about the item selected.
-     *          7.	Each activity must have at least 1 button
-     *          8.	Each activity must have at least 1 edit text with appropriate text input method.
-     * Milestone 2 (Must be demonstrated December 14th):
-     *          2.	Each Activity must use a fragment in its graphical interface.
-     *          5.	Each activity must use an AsyncTask in the code. This can be to open a Database, retrieve data from a server, save data, or any other reasonable circumstance.
-     *          6.	Each activity must have at least 1 progress bar
-     *          9.	Each activity must have at least 1 Toast, Snackbar, and custom dialog notification.
-     *
-     * Milestone 3 (Must be demonstrated December 21st):
-     *          1.  The software must have 1 different activity written by each person in your group. The activity must be accessible by selecting a graphical icon from a Toolbar.
-     *          4.  The items listed in the ListView must be stored by the application so that appear the next time the application is launched. The user must be able to add and delete items, which would then also be stored.
-     *          10.	A help menu item that displays a dialog with the author’s name, Activity version number, and instructions for how to use the interface.
-     *          11.	There must be at least 1 other language supported by your Activity. If you are not bilingual, then you must support both British and American English (words like colour, color, neighbour, neighbor, etc).
-     *          If you know a language other than English, then you can support that language in your application and don’t need to support American English.
-     *
-     * Activity Specific Requirements:
-     •	Create an application that records buying gasoline for a car. The user can select the number of litres, price, and kilometers of the gasoline they purchased. Display the entries in a ListView. The database should store the time that the information was recorded.
-     •	The user should be able to select items in the list view and edit them, or click a button to add a new purchase to the list.
-     •	The application should provide information including the average price of gas for the last month, how much gasoline the user purchased last month, and how much gasoline the user purchases per month.
-     *
-     */
-
+    /** Format displayed in the DatePicker and ListView of fuel details */
     public static final DateFormat DD_MM_YYYY = new SimpleDateFormat("dd/MM/yyyy", Locale.CANADA);
 
+    /** Request codes for operations */
     public static final int ADD_DETAILS_REQUEST = 1;
     public static final int EDIT_DETAILS_REQUEST = 2;
 
+    /** Constants used to determine the value to return for statistics calculations */
     private static final String AVERAGE = "average";
     private static final String TOTAL = "total";
 
+    /** The c_EnterFuelDetailsFragment loaded in this activity */
     private c_EnterFuelDetailsFragment loadedFragment = null;
+
+    /** Determines if the activity is in landscape (true) or portrait (false) */
     private boolean frameLayoutExists;
+
+    /** This activity's Toolbar */
     private Toolbar c_Toolbar;
-    private LinearLayout btnHome;
-    private LinearLayout btnAbout;
+
+    /** Parent Layout used to display SnackBar and Alert notifications */
     private View parentLayout;
-    private ListView lvPurchaseHistory;
+
+    /** Custom buttons used to add a purchase and view statistics */
     private LinearLayout btnAddPurchase;
     private LinearLayout btnViewFuelStats;
 
+    /** Controls used to display progress bar and percent loaded during the AsyncTask */
     private GridLayout glLoading;
     private ProgressBar pbLoadFuelDetails;
     private TextView tvLoadingPercentage;
 
+    /** Displays all fuel details entries */
+    private ListView lvPurchaseHistory;
+
+    /** Stores all the fuel detail entries */
     private ArrayList<c_FuelDetails> cFuelDetailsList;
+
+    /** Connects lvPurchaseHistory to cFuelDetailsList */
     private FuelDetailsAdapter adapter;
+
+    /** Database objects used in the activity */
     private m_GlobalDatabaseHelper carDbHelper;
     private SQLiteDatabase db;
     private Cursor cursor;
 
+    /**
+     * Sets up the database elements, finds the XML controls, sets up the event listeners,
+     * connects cFuelDetailsList to lvPurchaseHistory and executes an AsyncTask to load
+     * all fuel details entries from the database.
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -114,12 +115,20 @@ public class c_CarTrackerActivity extends AppCompatActivity {
         new DataBaseQuery().execute();
     }
 
+    /**
+     * Creates the activity's Toolbar
+     * @param menu resource to be inflated
+     * @return if the menu was successfully inflated
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         getMenuInflater().inflate(R.menu.c_menu, menu);
         return true;
     }
 
+    /**
+     * Closes the database resources when the application is destroyed
+     */
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -127,6 +136,10 @@ public class c_CarTrackerActivity extends AppCompatActivity {
         carDbHelper.close();
     }
 
+    /**
+     * Removes fragment that may have been loaded before the device's orientation changed
+     * @param newConfig
+     */
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         if (loadedFragment != null){
@@ -136,6 +149,13 @@ public class c_CarTrackerActivity extends AppCompatActivity {
         startActivity(new Intent(this, c_CarTrackerActivity.class));
     }
 
+    /**
+     * Determines which operation to be performed based on the requestCode sent and resultCode
+     * received.
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data){
 
@@ -155,6 +175,10 @@ public class c_CarTrackerActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Updates an existing fuel details entry in the database and in the activity's ArrayList
+     * @param fuelDetails information entered by the user
+     */
     protected void updateFuelDetail(Bundle fuelDetails){
 
         if (fuelDetails != null){
@@ -185,6 +209,10 @@ public class c_CarTrackerActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Adds a new fuel details entry to the database and to the activity's ArrayList
+     * @param fuelDetails information entered by the user
+     */
     protected void addFuelDetail(Bundle fuelDetails) {
         if (fuelDetails != null) {
             double price = fuelDetails.getDouble("price");
@@ -211,9 +239,14 @@ public class c_CarTrackerActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Removes a fuel details entry from the database and from the activity's ArrayList
+     * @param id of entry in the database
+     * @param position of c_FuelDetails in the ArrayList
+     */
     private void deleteFuelDetail(long id, int position){
 
-        // remove fragment (edit / add details) if it exsits
+        // remove fragment (edit / add details) if it exists
         if (loadedFragment != null){
             getFragmentManager().beginTransaction().remove(loadedFragment).commit();
         }
@@ -229,13 +262,25 @@ public class c_CarTrackerActivity extends AppCompatActivity {
                 Snackbar.LENGTH_LONG).show();
     }
 
-    // https://stackoverflow.com/questions/28171256/android-asynctask-that-fills-an-adapter-for-a-listview
+
+    /**
+     * AsyncTask used to open the database and load entries into the activity's ArrayList and ListView
+     * @author 		Nathan Doef
+     * @version		2
+     * References:
+     * Andy B(2015). Android - asynctask that fills an adapter for a listview [Webpage]. Retrieved from:
+     *      https://stackoverflow.com/questions/28171256/android-asynctask-that-fills-an-adapter-for-a-listview
+     */
     private class DataBaseQuery extends AsyncTask<String, Integer, ArrayList<c_FuelDetails>>{
 
+        /**
+         * Tasks to be performed on a different thread then the main UI thread
+         * @param args from the execute() method
+         * @return
+         */
         @Override
         protected ArrayList<c_FuelDetails> doInBackground(String[] args){
 
-            //testFillDB();
             cursor = db.rawQuery(m_GlobalDatabaseHelper.C_SELECT_ALL_SQL, null);
 
             // build an array list in the background and pass it back to the GUI thread
@@ -262,7 +307,8 @@ public class c_CarTrackerActivity extends AppCompatActivity {
                     Integer progress = (int )Math.round((++counter / totalRecords) * 100);
                     publishProgress(progress);
 
-                    Thread.sleep(100);
+                    // Added so progress bar will appear longer
+                    Thread.sleep(150);
 
                     cursor.moveToNext();
 
@@ -273,6 +319,10 @@ public class c_CarTrackerActivity extends AppCompatActivity {
             return detailsList;
         }
 
+        /**
+         * Updates the main GUI thread with the percentage of the entries loaded from the database
+         * @param value
+         */
         @Override
         protected void onProgressUpdate(Integer[] value){
             int progress = value[0];
@@ -282,6 +332,10 @@ public class c_CarTrackerActivity extends AppCompatActivity {
             pbLoadFuelDetails.setProgress(progress);
         }
 
+        /**
+         * Adds all database entries to the activity's ListView and removes the loading animation
+         * @param details ArrayList built up in the background thread
+         */
         @Override
         protected void onPostExecute(ArrayList<c_FuelDetails> details){
             cFuelDetailsList.clear();
@@ -292,22 +346,40 @@ public class c_CarTrackerActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Custom Adapter used to handle the functionality of displaying an ArrayList<c_FuelDetails>
+     * in the activity's ListView
+     * @author 		Nathan Doef
+     * @version		2
+     */
     private class FuelDetailsAdapter extends ArrayAdapter<c_FuelDetails> {
 
+        /** Constructor */
         private FuelDetailsAdapter(Context context) {
             super(context, 0);
         }
 
+        /**
+         * @return the number of elements in the activity'y ArrayList
+         */
         @Override
         public int getCount() {
             return cFuelDetailsList.size();
         }
 
+        /**
+         * @param position in the activity's ArrayList
+         * @return object in the ArrayList
+         */
         @Override
         public c_FuelDetails getItem(int position) {
             return cFuelDetailsList.get(position);
         }
 
+        /**
+         * @param position  in the activity's ArrayList
+         * @return the database id for the entry
+         */
         @Override
         public long getItemId(int position) {
             if (cursor == null)
@@ -318,18 +390,31 @@ public class c_CarTrackerActivity extends AppCompatActivity {
             return cursor.getLong(cursor.getColumnIndex(m_GlobalDatabaseHelper.KEY_ID));
         }
 
-        // https://stackoverflow.com/questions/17525886/listview-with-add-and-delete-buttons-in-each-row-in-android
+        //
+
+        /**
+         * Sets up the View that will be inflated for each row of the ListView
+         * References:
+         * adam83(2014). ListView with Add and Delete Buttons in each Row in android [WebPage] Retrieved from:
+         *      https://stackoverflow.com/questions/17525886/listview-with-add-and-delete-buttons-in-each-row-in-android
+         * @param position in the arrayList
+         * @param convertView
+         * @param parent of the ListView
+         * @return View to be loaded into the row of the ListView
+         */
         @Override
         @NonNull
         public View getView(final int position, View convertView, ViewGroup parent) {
 
             View view = convertView;
 
+            // only inflate if not already created
             if (view == null){
                 LayoutInflater inflater = c_CarTrackerActivity.this.getLayoutInflater();
                 view = inflater.inflate(R.layout.c_fuel_details_summary, parent, false);
             }
 
+            // create a striped table effect
             TableRow fuelDetailRow = view.findViewById(R.id.fuelDetailRow);
             if ((position % 2) == 0){
                 fuelDetailRow.setBackgroundColor(getResources().getColor(R.color.c_rowWhite));
@@ -337,11 +422,13 @@ public class c_CarTrackerActivity extends AppCompatActivity {
                 fuelDetailRow.setBackgroundColor(getResources().getColor(R.color.c_rowBlue));
             }
 
+            // Event handler for when the delete icon is tapped
             RelativeLayout btnDeleteFuelDetails = view.findViewById(R.id.btnDeleteFuelDetails);
             btnDeleteFuelDetails.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
 
+                    // display confirmation dialog
                     LayoutInflater inflater = getLayoutInflater();
                     LinearLayout rootView
                             = (LinearLayout) inflater.inflate(R.layout.c_custom_alert_dialog, null);
@@ -351,6 +438,8 @@ public class c_CarTrackerActivity extends AppCompatActivity {
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(c_CarTrackerActivity.this);
                     builder.setView(rootView);
+
+                    // get the database id of the entry being displayed in the View and delete it
                     builder.setPositiveButton(getResources().getString(R.string.c_Yes),
                         new DialogInterface.OnClickListener() {
                             @Override
@@ -361,6 +450,7 @@ public class c_CarTrackerActivity extends AppCompatActivity {
                         }
                     );
 
+                    // close dialog if user does not want to delete entry
                     builder.setNegativeButton(getResources().getString(R.string.c_No),
                             new DialogInterface.OnClickListener() {
                                 @Override
@@ -373,8 +463,10 @@ public class c_CarTrackerActivity extends AppCompatActivity {
                 }
             });
 
+            // get c_FuelDetails object from the activity's ArrayList
             c_FuelDetails details = getItem(position);
 
+            // display all fields of c_FuelDetails in the ListView row
             if (details != null){
                 TextView tvPrice = view.findViewById(R.id.tvPrice);
                 tvPrice.setText(String.valueOf(details.getPrice()));
@@ -392,6 +484,9 @@ public class c_CarTrackerActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Find all of the XML controls for the Views that were declared as instance variables
+     */
     private void findControls(){
         frameLayoutExists = (findViewById(R.id.flEnterFuelDetailsHolder) != null);
         c_Toolbar = findViewById(R.id.c_Toolbar);
@@ -405,12 +500,17 @@ public class c_CarTrackerActivity extends AppCompatActivity {
         tvLoadingPercentage = findViewById(R.id.tvLoadingPercentage);
     }
 
+    /**
+     * Sets up all the listeners for instance variable Views
+     */
     private void setUpListeners(){
+
+        // Event Handler when the user taps the Add Purchase button
         btnAddPurchase.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                // landscape orientation
+                // landscape orientation - loaded fragment
                 if (frameLayoutExists){
                     Bundle fragmentDetails = new Bundle();
                     fragmentDetails.putString("btnText", getResources().getString(R.string.c_BtnAddPurchase));
@@ -426,7 +526,7 @@ public class c_CarTrackerActivity extends AppCompatActivity {
                             .replace(R.id.flEnterFuelDetailsHolder, addFragment).commit();
                 }
 
-                // portrait orientation
+                // portrait orientation - send to new activity
                 else {
                     Intent intent = new Intent(c_CarTrackerActivity.this,
                             c_AddFuelDetailsActivity.class);
@@ -436,6 +536,9 @@ public class c_CarTrackerActivity extends AppCompatActivity {
         });
 
 
+        // Event Handler for when the user clicks the View Fuel Statistics button
+        // Gets fuel statistics from this activity's private methods and sends them to the
+        // new activity.
         btnViewFuelStats.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -452,6 +555,7 @@ public class c_CarTrackerActivity extends AppCompatActivity {
             }
         });
 
+        // Event handler for when a row in the ListView is tapped
         lvPurchaseHistory.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
@@ -465,7 +569,7 @@ public class c_CarTrackerActivity extends AppCompatActivity {
                 fuelDetails.putLong("id", id);
                 fuelDetails.putInt("position", position);
 
-                // the device is in landscape mode
+                // landscape mode - load fragment
                 if (frameLayoutExists){
                     Bundle fragmentDetails = new Bundle();
                     fragmentDetails.putString("btnText", getResources().getString(R.string.c_BtnSaveDetails));
@@ -475,14 +579,14 @@ public class c_CarTrackerActivity extends AppCompatActivity {
                     c_EnterFuelDetailsFragment editFragment = new c_EnterFuelDetailsFragment();
                     editFragment.setArguments(fragmentDetails);
 
-                    // cache the fragment so it can be removed
+                    // cache the fragment so it can be removed on orientation changes
                     loadedFragment = editFragment;
 
                     getFragmentManager().beginTransaction()
                             .replace(R.id.flEnterFuelDetailsHolder, editFragment).commit();
                 }
 
-                // the device is in portrait mode
+                // portrait mode - send to new activity
                 else {
                     Intent intent = new Intent(c_CarTrackerActivity.this, c_EditFuelDetailsActivity.class);
                     intent.putExtra("fuelDetails", fuelDetails);
@@ -492,27 +596,37 @@ public class c_CarTrackerActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Handles the functionality when a MenuItem is selected from the Activity's Toolbar
+     * @param menuItem
+     * @return if the MenuItem event was handled successfully
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
 
         switch(menuItem.getItemId()){
 
+            // send to Activity Tracker activity
             case R.id.menu_exercise:
                 startActivity(new Intent(c_CarTrackerActivity.this, a_ActivityTrackerActivity.class));
                 break;
 
+            // send to Nutrition Tracker activity
             case R.id.menu_food:
                 startActivity(new Intent(c_CarTrackerActivity.this, n_NutritionTrackerActivity.class));
                 break;
 
+            // send to Thermostat Tracker activity
             case R.id.menu_thermostat:
                 startActivity(new Intent(c_CarTrackerActivity.this, t_ThermostatProgramActivity.class));
                 break;
 
+            // send to Home page
             case R.id.menu_home:
                 startActivity(new Intent(c_CarTrackerActivity.this, m_MainActivity.class));
                 break;
 
+            // Display the Car Tracker Activity's help menu
             case R.id.menu_help:
                 LayoutInflater inflater = getLayoutInflater();
                 LinearLayout rootView
@@ -540,7 +654,10 @@ public class c_CarTrackerActivity extends AppCompatActivity {
         return true;
     }
 
-    // STATISTICS FUNCTIONS
+    /**
+     * gets the total gas purchases by month and year if there were any purchases
+     * @return an ArrayList of c_FuelStats {" month year": total gas purchases}
+     */
     private ArrayList<c_FuelStats> getPrevGasPurchasesByMonth(){
         ArrayList<c_FuelStats> purchases = new ArrayList<>();
 
@@ -556,6 +673,8 @@ public class c_CarTrackerActivity extends AppCompatActivity {
 
             String monthYear = getResources().getStringArray(R.array.c_months)[month] + " " + String.valueOf(year);
 
+            // multiply the price of gas by the total number of litres to get the total purchase price
+            // of the entry in the database
             double purchasePrice = cursor.getDouble(cursor.getColumnIndex(m_GlobalDatabaseHelper.KEY_PRICE))
                     * cursor.getDouble(cursor.getColumnIndex(m_GlobalDatabaseHelper.KEY_LITRES));
 
@@ -565,7 +684,9 @@ public class c_CarTrackerActivity extends AppCompatActivity {
             if (purchases.isEmpty() || !purchases.get(purchases.size()-1).getMonthYear().equals(monthYear)){
                 stats = new c_FuelStats(monthYear, purchasePrice);
                 purchases.add(stats);
-            } else {
+            }
+            // there is already an entry for the month year combination, increment the amount
+            else {
                 stats = purchases.get(purchases.size()-1);
                 stats.setTotalPurchases(stats.getTotalPurchases() + purchasePrice);
             }
@@ -575,6 +696,11 @@ public class c_CarTrackerActivity extends AppCompatActivity {
         return purchases;
     }
 
+    /**
+     * gets the average gas price of previous month or total gas purchases
+     * @param stat AVERAGE (gas price of previous month) TOTAL (purchases for previous month)
+     * @return
+     */
     private double getPrevMonthGasStat(String stat){
         String table = m_GlobalDatabaseHelper.FUEL_DETAILS_TABLE;
         String where = m_GlobalDatabaseHelper.KEY_DATE + " >= ? AND " + m_GlobalDatabaseHelper.KEY_DATE + " <= ?";
@@ -598,15 +724,21 @@ public class c_CarTrackerActivity extends AppCompatActivity {
             cursor.moveToNext();
         }
 
+        // calculate the average gas price
         if (stat.equals(AVERAGE) && cursor.getCount() != 0){
             return (gasPriceSum / cursor.getCount());
         }
+        // return the total gas price
         else if (stat.equals(TOTAL)){
             return totalPrice;
         }
         return -1; // no results
     }
 
+    /**
+     * gets the first time stamp of the previous month
+     * @return timestamp
+     */
     private long getFirstTimestampOfPrevMonth(){
         Calendar calendar = getPrevMonthAndYear();
         calendar.set(Calendar.DAY_OF_MONTH, 1);
@@ -618,7 +750,10 @@ public class c_CarTrackerActivity extends AppCompatActivity {
         return firstDateOfPrevMonth.getTime();
     }
 
-    // java2s getthelastdayofamonth
+    /**
+     * gets the last time stamp of the previous month
+     * @return timestamp
+     */
     private long getLastTimestampOfPrevMonth(){
         Calendar calendar = getPrevMonthAndYear();
         int lastDate = calendar.getActualMaximum(Calendar.DATE);
@@ -631,6 +766,10 @@ public class c_CarTrackerActivity extends AppCompatActivity {
         return lastDayOfPrevMonth.getTime();
     }
 
+    /**
+     * gets a calendar object for the previous month and year
+     * @return calendar
+     */
     private Calendar getPrevMonthAndYear(){
         Calendar calendar = Calendar.getInstance();
         int currMonth = calendar.get(Calendar.MONTH);

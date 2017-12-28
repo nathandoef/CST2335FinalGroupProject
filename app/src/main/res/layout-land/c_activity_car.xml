@@ -4,27 +4,28 @@
     android:id="@+id/fuelDetailsParent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
     tools:context="com.example.joe.cst2335finalgroupproject.c_CarTrackerActivity">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/c_Toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"/>
 
     <FrameLayout
         android:id="@+id/flFuelDetailsSummaryPane"
         android:layout_width="590dp"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
+        android:layout_below="@id/c_Toolbar"
         android:layout_alignParentStart="true">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/c_Toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="?attr/colorPrimary"
-                android:minHeight="?attr/actionBarSize"
-                android:theme="?attr/actionBarTheme" />
 
             <LinearLayout
                 android:id="@+id/btnAddPurchase"
@@ -34,7 +35,6 @@
                 android:layout_marginBottom="20dp"
                 android:gravity="center_vertical"
                 android:layout_alignParentEnd="true"
-                android:layout_below="@id/c_Toolbar"
                 android:clickable="true"
                 android:background="@drawable/c_custom_button">
 

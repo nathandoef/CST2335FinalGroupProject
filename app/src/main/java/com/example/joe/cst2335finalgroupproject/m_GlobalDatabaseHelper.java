@@ -4,6 +4,11 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+/**
+ * Global Database Helper to avoid the creation of multiple small databases
+ * @author 		Joe Ireland
+ * @version		2
+ */
 public class m_GlobalDatabaseHelper extends SQLiteOpenHelper {
 
     //Car Database and Column Names
@@ -69,14 +74,23 @@ public class m_GlobalDatabaseHelper extends SQLiteOpenHelper {
             + NOTE_COL_NAME + " INTEGER, "
             + TIME_COL_NAME + " DATETIME DEFAULT CURRENT_TIMESTAMP "
             + " );";
-    //Database Version Number
+
+    /** Database Version Number */
     private static final int DATABASE_VERSION_NUM = 1;  //WARNING: AVOID ALTERING THIS VALUE UNLESS REQUIRED. THIS WILL CLEAR ALL TABLES FOR ALL ACTIVITIES.
 
 
+    /**
+     * Constructor
+     * @param ctx
+     */
     m_GlobalDatabaseHelper(Context ctx) {
         super(ctx, DATABASE_NAME, null, DATABASE_VERSION_NUM);
     }
 
+    /**
+     * Creates new tables in the database
+     * @param db
+     */
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_THERMOSTAT_TABLE_SQL);
@@ -85,6 +99,12 @@ public class m_GlobalDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_ACTIVITY_TABLE_SQL);
     }
 
+    /**
+     * Drops and recreates tables if version is upgraded
+     * @param db
+     * @param oldVer
+     * @param newVer
+     */
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVer, int newVer) {
         db.execSQL(DROP_THERMOSTAT_TABLE_SQL);
@@ -94,6 +114,12 @@ public class m_GlobalDatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    /**
+     * Drops and recreates tables if version is downgraded
+     * @param db
+     * @param oldVer
+     * @param newVer
+     */
     @Override
     public void onDowngrade(SQLiteDatabase db, int oldVer, int newVer) {
         db.execSQL(DROP_THERMOSTAT_TABLE_SQL);
@@ -102,5 +128,4 @@ public class m_GlobalDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(DROP_ACTIVITY_TABLE_SQL);
         onCreate(db);
     }
-
 }
