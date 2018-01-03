@@ -308,7 +308,7 @@ public class c_CarTrackerActivity extends AppCompatActivity {
                     publishProgress(progress);
 
                     // Added so progress bar will appear longer
-                    Thread.sleep(150);
+                    Thread.sleep(500);
 
                     cursor.moveToNext();
 

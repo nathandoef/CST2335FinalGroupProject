@@ -44,7 +44,7 @@
     <string name="c_LblPrice">Prix ($/L)</string>
     <string name="c_LblLitres">Liters (L)</string>
     <string name="c_LblKilometers">Distance (km)</string>
-    <string name="c_LblDate">Date (jj/mm/aaaa)</string>
+    <string name="c_LblDate">Date\n(jj/mm/aaaa)</string>
 
     <string name="c_LblPriceHeading">Prix\n($/L)</string>
     <string name="c_LblLitresHeading">Liters\n(L)</string>
@@ -98,7 +98,7 @@
         \t\u2022 Modifier une entrée en appuyant sur une ligne\n
         \t\u2022 Supprimer une entrée en appuyant sur l\'icône rouge\n\t\tminus\n
         \t\u2022 Ajouter une entrée en appuyant sur le bouton\n\t\t «Ajouter une entrée»\n
-        \t\u2022 Appuyez sur le bouton «Afficher les statistiques d'achat de carburant»\n\t tpour afficher les statistiques sur les carburants passés\n
+        \t\u2022 Appuyez sur le bouton «Afficher les statistiques d\'achat\n\tde carburant» pour afficher les\n\tstatistiques sur les carburants passés\n
         \t\u2022 Rentrez chez vous en appuyant sur le bouton «Accueil»
     </string>
 

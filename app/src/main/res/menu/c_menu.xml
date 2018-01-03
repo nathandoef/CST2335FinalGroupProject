@@ -26,14 +26,14 @@
     <item
         android:id="@+id/menu_home"
         android:title="@string/c_home"
-        android:icon="@drawable/icons8_home_filled_50"
+        android:icon="@drawable/c_icons8_home_filled_50"
         android:orderInCategory="250"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/menu_help"
         android:title="@string/c_help"
-        android:icon="@drawable/icons8_help_50"
+        android:icon="@drawable/c_icons8_help_50"
         android:orderInCategory="300"
         app:showAsAction="never"/>
 

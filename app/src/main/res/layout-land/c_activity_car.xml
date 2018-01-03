@@ -46,7 +46,7 @@
                     android:textSize="17sp"/>
 
                 <ImageView
-                    android:src="@drawable/icons8_plus_50"
+                    android:src="@drawable/c_icons8_plus_50"
                     style="@style/c_ActionIcon"/>
 
             </LinearLayout>
@@ -64,7 +64,7 @@
                 android:background="@drawable/c_custom_button">
 
                 <ImageView
-                    android:src="@drawable/icons8_futures_50"
+                    android:src="@drawable/c_icons8_futures_50"
                     style="@style/c_ActionIcon" />
 
                 <TextView
